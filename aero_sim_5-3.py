@@ -28,7 +28,7 @@ def simulation(window, **kwargs):
     t_end = kwargs["t_end"]
     dt = kwargs["dt"]
 
-    dx = window.thickness / (DIV_X - 1)
+    dx = window.thickness / DIV_X
     DIV_TIME = int(t_end / dt)
 
     LOOP_CALC_NUM = 100     # 繰り返し計算実行回数
@@ -47,7 +47,7 @@ def simulation(window, **kwargs):
     pos_buf = []
     temp_buf = []
 
-    for i in range(0, DIV_X):
+    for i in range(0, DIV_X + 1):
         time_buf.append(0)
         pos_buf.append(i * dx)
         temp_buf.append(temp[i])
@@ -57,7 +57,7 @@ def simulation(window, **kwargs):
         for k in range(1, LOOP_CALC_NUM):
             resd = 0.0
             # 陰解法の離散化式
-            for i in range(1, DIV_X - 1):
+            for i in range(1, DIV_X):
                 tp = temp_new[i]
                 temp_new[i] = temp[i] + window.alpha * dt / dx**2\
                     * (temp_new[i + 1] + temp_new[i - 1])
@@ -66,15 +66,12 @@ def simulation(window, **kwargs):
             if resd <= EPS:
                 break
 
-        for i in range(1, DIV_X - 1):
+        for i in range(1, DIV_X):
             temp[i] = temp_new[i]
-
-        temp[0] = temp_new[0] = window.temp_1
-        temp[DIV_X - 1] = temp_new[DIV_X - 1] = window.temp_2
 
         time = j * dt
 
-        for i in range(0, DIV_X):
+        for i in range(0, DIV_X + 1):
             time_buf.append(time)
             pos_buf.append(i * dx)
             temp_buf.append(temp[i])

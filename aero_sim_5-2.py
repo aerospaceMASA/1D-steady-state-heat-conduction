@@ -27,7 +27,7 @@ def simulation(window, **kwargs):
     DIV_X = kwargs["div_x"]
     t_end = kwargs["t_end"]
     dt = kwargs["dt"]
-    dx = window.thickness / (DIV_X - 1)
+    dx = window.thickness / DIV_X
     DIV_TIME = int(t_end / dt)
 
     # 初期条件
@@ -45,26 +45,26 @@ def simulation(window, **kwargs):
     temp_buf = []
 
     # 初期条件をグラフ描画用リストに保存
-    for i in range(0, DIV_X):
+    for i in range(0, DIV_X + 1):
         time_buf.append(0)
         pos_buf.append(i * dx)
         temp_buf.append(temp[i])
 
     for n in range(1, DIV_TIME + 1):
         # 陽解法の離散化式
-        for i in range(1, DIV_X - 1):
+        for i in range(1, DIV_X):
             temp_new[i] = temp[i] + window.alpha * dt / dx**2\
                 * (temp[i + 1] - 2 * temp[i] + temp[i - 1])
 
-        for i in range(1, DIV_X - 1):
+        for i in range(1, DIV_X):
             temp[i] = temp_new[i]
 
-        temp[0] = window.temp_1
-        temp[DIV_X - 1] = window.temp_2
+        # temp[0] = window.temp_1
+        # temp[DIV_X - 1] = window.temp_2
 
         time = n * dt
 
-        for i in range(0, DIV_X):
+        for i in range(0, DIV_X + 1):
             time_buf.append(time)
             pos_buf.append(i * dx)
             temp_buf.append(temp[i])
