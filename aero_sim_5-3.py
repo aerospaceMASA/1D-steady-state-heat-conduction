@@ -26,13 +26,13 @@ class Window:
 def simulation(window, **kwargs):
     DIV_X = kwargs["div_x"]
     t_end = kwargs["t_end"]
-
     dt = kwargs["dt"]
+
     dx = window.thickness / (DIV_X - 1)
     DIV_TIME = int(t_end / dt)
 
-    # 繰り返し計算実行回数
-    LOOP_CALC_NUM = 100
+    LOOP_CALC_NUM = 100     # 繰り返し計算実行回数
+    EPS = 1.0e-8            # 反復計算時の収束判定
 
     # 初期条件
     time = 0.0
@@ -53,12 +53,18 @@ def simulation(window, **kwargs):
         temp_buf.append(temp[i])
 
     for j in range(1, DIV_TIME + 1):
+        # ガウス・ザイデル法による反復計算
         for k in range(1, LOOP_CALC_NUM):
+            resd = 0.0
             # 陰解法の離散化式
             for i in range(1, DIV_X - 1):
+                tp = temp_new[i]
                 temp_new[i] = temp[i] + window.alpha * dt / dx**2\
                     * (temp_new[i + 1] + temp_new[i - 1])
                 temp_new[i] /= 1 + 2 * window.alpha * dt / dx**2
+                resd += abs(temp_new[i] - tp)
+            if resd <= EPS:
+                break
 
         for i in range(1, DIV_X - 1):
             temp[i] = temp_new[i]
